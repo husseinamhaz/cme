@@ -21,7 +21,7 @@ class CreatePharmacyTable extends Migration
             $table->string('delivery')->nullable();
             $table->string('email_address')->nullable();
             $table->string('phone_number');
-            $table->integer('image_id')->nullable();
+            $table->string('logo')->nullable();
             $table->timestamps();
         });
     }
