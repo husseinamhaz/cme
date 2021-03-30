@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/pharmacy','PharmacyController@store');
+Route::get('/pharmacy','PharmacyController@list');
+Route::delete('/pharmacy/{id}','PharmacyController@delete');
