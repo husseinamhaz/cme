@@ -1972,6 +1972,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1983,32 +2000,106 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
         name: null,
         phone_number: null,
         email_address: null,
-        delivery: null
+        delivery: null,
+        images: [],
+        logo: null
       },
-      pharmacies: []
+      pharmacies: [],
+      modal_type: 'create'
     };
   },
   mounted: function mounted() {
     var _this = this;
 
-    console.log('Component mounted.');
-    vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/pharmacy').then(function (response) {
+    vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/pharmacy').then(function (response) {
       _this.pharmacies = response.data;
     });
   },
   methods: {
     savePharmacy: function savePharmacy() {
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('/pharmacy', this.new_pharmacy).then(function (response) {
-        this.new_pharmacy = {};
+      var form = new FormData();
+      form.append('name', this.new_pharmacy.name);
+      form.append('phone_number', this.new_pharmacy.phone_number);
+
+      if (this.new_pharmacy.images && this.new_pharmacy.images.length) {
+        for (var i = 0; i < this.new_pharmacy.images.length; i++) {
+          form.append('images[]', this.new_pharmacy.images[i]);
+        }
+      }
+
+      if (this.new_pharmacy.delivery) form.append('delivery', this.new_pharmacy.delivery);
+      if (this.new_pharmacy.logo) form.append('logo[]', this.new_pharmacy.logo);
+      if (this.new_pharmacy.email_address) form.append('email_address', this.new_pharmacy.email_address);
+      var that = this;
+      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('/api/pharmacy', form).then(function (response) {
+        $('#exampleModal').modal('hide');
+        that.new_pharmacy = {};
+        that.pharmacies.push(response.data);
+        that.$forceUpdate();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    updatePharmacy: function updatePharmacy() {
+      var form = new FormData();
+      form.append('name', this.new_pharmacy.name);
+      form.append('phone_number', this.new_pharmacy.phone_number);
+
+      if (this.new_pharmacy.images && this.new_pharmacy.images.length) {
+        for (var i = 0; i < this.new_pharmacy.images.length; i++) {
+          form.append('images[]', this.new_pharmacy.images[i]);
+        }
+      }
+
+      if (this.new_pharmacy.delivery) form.append('delivery', this.new_pharmacy.delivery);
+      if (this.new_pharmacy.logo) form.append('logo[]', this.new_pharmacy.logo);
+      if (this.new_pharmacy.email_address) form.append('email_address', this.new_pharmacy.email_address);
+      var that = this;
+      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.put('/api/pharmacy/' + this.new_pharmacy.id, form).then(function (response) {
+        $('#exampleModal').modal('hide');
+        that.new_pharmacy = {}; // that.pharmacies.push(response.data);
+
+        that.modal_type = 'create';
+        that.$forceUpdate();
       })["catch"](function (error) {
         console.log(error);
       });
     },
     deletePharmacy: function deletePharmacy(data) {
       var that = this;
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios["delete"]('/pharmacy/' + data.id).then(function (response) {
+      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios["delete"]('/api/pharmacy/' + data.id).then(function (response) {
         if (response) that.pharmacies.splice(that.pharmacies.indexOf(data), 1);
       });
+    },
+    onFileChange: function onFileChange(e) {
+      var files = e.target.files || e.target.files;
+      if (!files.length) return;
+      this.new_pharmacy.images = files;
+    },
+    editPharmacy: function editPharmacy(pharmacy) {
+      var pharma = JSON.parse(JSON.stringify(pharmacy));
+      delete pharma.logo;
+      delete pharma.images;
+      this.new_pharmacy = pharma;
+      this.modal_type = 'update';
+      this.$forceUpdate();
+    },
+    onLogoChanged: function onLogoChanged(e) {
+      var files = e.target.files || e.target.files;
+      if (!files.length) return;
+      this.new_pharmacy.logo = files[0];
+    },
+    addNewPharmacyPopup: function addNewPharmacyPopup() {
+      this.new_pharmacy = {
+        name: null,
+        phone_number: null,
+        email_address: null,
+        delivery: null,
+        images: [],
+        logo: null
+      };
+      this.modal_type = 'create';
+      this.$forceUpdate();
     }
   }
 });
@@ -37703,10 +37794,15 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "card" }, [
-              _c("img", {
-                staticClass: "card-img-top",
-                attrs: { src: "", alt: "Card image cap" }
-              }),
+              pharmacy.logo
+                ? _c("img", {
+                    staticClass: "card-img-top",
+                    attrs: {
+                      src: "images/logos/" + pharmacy.logo,
+                      alt: "Card image cap"
+                    }
+                  })
+                : _vm._e(),
               _vm._v(" "),
               _c("div", { staticClass: "card-body" }, [
                 _c("h5", { staticClass: "card-title" }, [
@@ -37725,6 +37821,25 @@ var render = function() {
                   _vm._v("Delivery: " + _vm._s(pharmacy.delivery))
                 ])
               ]),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-info",
+                  attrs: {
+                    type: "button",
+                    "data-toggle": "modal",
+                    "data-target": "#exampleModal",
+                    "data-whatever": "@mdo"
+                  },
+                  on: {
+                    click: function($event) {
+                      return _vm.editPharmacy(pharmacy)
+                    }
+                  }
+                },
+                [_vm._v("Edit\n            ")]
+              ),
               _vm._v(" "),
               _c(
                 "button",
@@ -37753,7 +37868,8 @@ var render = function() {
             "data-toggle": "modal",
             "data-target": "#exampleModal",
             "data-whatever": "@mdo"
-          }
+          },
+          on: { click: _vm.addNewPharmacyPopup }
         },
         [_vm._v("Add New Pharmacy\n    ")]
       ),
@@ -37922,6 +38038,34 @@ var render = function() {
                         }
                       }
                     })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "exampleFormControlFile2" } }, [
+                      _vm._v("Logo")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control-file",
+                      attrs: { type: "file", id: "exampleFormControlFile2" },
+                      on: { change: _vm.onLogoChanged }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { for: "exampleFormControlFile1" } }, [
+                      _vm._v("Images")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control-file",
+                      attrs: {
+                        multiple: "",
+                        type: "file",
+                        id: "exampleFormControlFile1"
+                      },
+                      on: { change: _vm.onFileChange }
+                    })
                   ])
                 ]),
                 _vm._v(" "),
@@ -37935,15 +38079,25 @@ var render = function() {
                     [_vm._v("Close")]
                   ),
                   _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "button" },
-                      on: { click: _vm.savePharmacy }
-                    },
-                    [_vm._v("Save")]
-                  )
+                  _vm.modal_type === "update"
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "button" },
+                          on: { click: _vm.updatePharmacy }
+                        },
+                        [_vm._v("Update\n                    ")]
+                      )
+                    : _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "button" },
+                          on: { click: _vm.savePharmacy }
+                        },
+                        [_vm._v("Save")]
+                      )
                 ])
               ])
             ]

@@ -25,7 +25,8 @@ class PharmacyRequest extends FormRequest
     {
         return [
             'name'=>'required',
-            'phone_number'=>'required'
+            'phone_number'=>'required|numeric|min:6',
+            'email_address'=>'email',
         ];
     }
 }

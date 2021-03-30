@@ -74,27 +74,3 @@
 </body>
 </html>
 <script src="{{ asset('js/app.js') }}"></script>
-
-<script>
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', "http://127.0.0.1:8000/pharmacy", true);
-    xhr.send();
-
-    xhr.onreadystatechange = processRequest;
-
-    function processRequest(e) {
-        console.log(e);
-    }
-
-    const url = 'http://127.0.0.1:8000/pharmacy';
-    const data = {
-        name: "said",
-        phone_number: "said",
-        "_token": "{{ csrf_token() }}",
-    };
-    $('.btn').click(function () {
-        $.post(url, data, function (data, status) {
-            console.log(data);
-        })
-    })
-</script>
