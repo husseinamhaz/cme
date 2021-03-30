@@ -13,4 +13,5 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('pharmacy/search','PharmacyController@search');
 Route::resource('pharmacy','PharmacyController');

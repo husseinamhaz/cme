@@ -1,5 +1,18 @@
 <template>
     <div class="col-md-12">
+        <div class="col-md-12" style="margin-top: 25px">
+            <div class="form-group col-md-4" style="float:left">
+                <label style="float:left" for="filter_delivery" class="col-form-label col-md-4">Filter by Delivery:</label>
+                <input style="float:left" type="text" v-model="filter.delivery" class="form-control col-md-8" id="filter_delivery">
+            </div>
+            <div style="float:left" class="form-group col-md-4">
+                <label style="float:left" for="filter_name" class="col-form-label col-md-4">Filter by Name:</label>
+                <input style="float:left" type="text" v-model="filter.name" class="form-control col-md-8" id="filter_name">
+            </div>
+            <div style="float:left" class="form-group col-md-4">
+                <button type="button" @click="search" class="btn btn-primary">Search</button>
+            </div>
+        </div>
         <div v-for="pharmacy in pharmacies" class=" col-md-2" style=" float: left; padding-bottom:15px">
             <div class="card">
                 <img class="card-img-top" v-if="pharmacy.logo" :src="'images/logos/'+pharmacy.logo"
@@ -89,6 +102,10 @@ export default {
                 delivery: null,
                 images: [],
                 logo: null,
+            },
+            filter:{
+                delivery:null,
+                name:null
             },
             pharmacies: [],
             modal_type: 'create'
@@ -181,6 +198,18 @@ export default {
             if (!files.length)
                 return;
             this.new_pharmacy.logo = files[0];
+        },
+        search(){
+            let filters={};
+            if(this.filter.delivery){
+                filters.delivery=this.filter.delivery;
+            }
+            if(this.filter.name){
+                filters.name=this.filter.name;
+            }
+            Vue.axios.post('http://127.0.0.1:8000/api/pharmacy/search',filters).then((response) => {
+                this.pharmacies = response.data;
+            })
         },
         addNewPharmacyPopup() {
             this.new_pharmacy = {

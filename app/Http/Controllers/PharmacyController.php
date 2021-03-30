@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\PharmacyRequest;
+use App\Http\Requests\SearchPharmacyRequest;
 use App\Pharmacy;
 use App\Images;
 use File;
@@ -24,7 +25,7 @@ class PharmacyController extends Controller
 
             $query = new Pharmacy();
             if (isset($data['logo'])) {
-                $logo=$data['logo'][0];
+                $logo = $data['logo'][0];
                 $imagesFolder = public_path() . '/images/logos';
                 $extension = $logo->getClientOriginalExtension();
                 $filename = $data['name'] . '.jpg';
@@ -45,7 +46,7 @@ class PharmacyController extends Controller
             $query->save();
 
             if (isset($data['images'])) {
-                $this->storeImages($query->id,$data['images']);
+                $this->storeImages($query->id, $data['images']);
             }
             return $query->load('images');
         } catch (\Exception $e) {
@@ -57,7 +58,11 @@ class PharmacyController extends Controller
 
     }
 
-    public function storeImages($id,$images){
+    /**
+     * Store Images of Pharmacy
+     */
+    public function storeImages($id, $images)
+    {
 
         // Names of folders
         $imagesFolder = public_path() . '/images/' . $id;
@@ -77,6 +82,9 @@ class PharmacyController extends Controller
         }
     }
 
+    /**
+     * list Pharmacies
+     */
     public function index()
     {
 
@@ -91,13 +99,40 @@ class PharmacyController extends Controller
         }
     }
 
+
+    /**
+     * Search Pharmacy
+     */
+    public function search(SearchPharmacyRequest $request)
+    {
+        $request = $request->all();
+        try {
+            if (isset($request['delivery']) && isset($request['name']))
+                return Pharmacy::where('delivery', $request['delivery'])->where('name', $request['name'])->get();
+            elseif($request['delivery'])
+                return Pharmacy::where('delivery', $request['delivery'])->get();
+            elseif(isset($request['name']))
+                return Pharmacy::where('name', $request['name'])->get();
+            return [];
+
+        } catch (\Exception $e) {
+            return [
+                'message' => $e->getMessage(),
+                'error' => $e->getCode(),
+            ];
+        }
+    }
+
+    /**
+     * Delete Pharmacy
+     */
     public function destroy($id)
     {
 
         try {
-            $pharmacy=Pharmacy::find($id);
-            if(File::exists(public_path() . '/images/logos/'.$pharmacy->name.'.jpg')) {
-                File::delete(public_path() . '/images/logos/'.$pharmacy->name.'.jpg');
+            $pharmacy = Pharmacy::find($id);
+            if (File::exists(public_path() . '/images/logos/' . $pharmacy->name . '.jpg')) {
+                File::delete(public_path() . '/images/logos/' . $pharmacy->name . '.jpg');
             }
             return $pharmacy->delete();;
 
@@ -109,15 +144,18 @@ class PharmacyController extends Controller
         }
     }
 
+    /**
+     * Update Pharmacy
+     */
     public function update(PharmacyRequest $request)
     {
 
         try {
             //get request data
             $data = $request->all();
-            $pharmacy=Pharmacy::find($data['id']);
+            $pharmacy = Pharmacy::find($data['id']);
             if (isset($data['logo'])) {
-                $logo=$data['logo'][0];
+                $logo = $data['logo'][0];
                 $imagesFolder = public_path() . '/images/logos';
                 $extension = $logo->getClientOriginalExtension();
                 $filename = $data['name'] . '.' . $extension;
