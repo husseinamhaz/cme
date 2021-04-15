@@ -1,27 +1,11 @@
 <template>
     <div class="col-md-12">
-        <div class="col-md-12" style="margin-top: 25px">
-            <div class="form-group col-md-4" style="float:left">
-                <label style="float:left" for="filter_delivery" class="col-form-label col-md-4">Filter by Delivery:</label>
-                <input style="float:left" type="text" v-model="filter.delivery" class="form-control col-md-8" id="filter_delivery">
-            </div>
-            <div style="float:left" class="form-group col-md-4">
-                <label style="float:left" for="filter_name" class="col-form-label col-md-4">Filter by Name:</label>
-                <input style="float:left" type="text" v-model="filter.name" class="form-control col-md-8" id="filter_name">
-            </div>
-            <div style="float:left" class="form-group col-md-4">
-                <button type="button" @click="search" class="btn btn-primary">Search</button>
-            </div>
-        </div>
         <div v-for="pharmacy in pharmacies" class=" col-md-2" style=" float: left; padding-bottom:15px">
             <div class="card">
-                <img class="card-img-top" v-if="pharmacy.logo" :src="'images/logos/'+pharmacy.logo"
-                     alt="Card image cap">
                 <div class="card-body">
-                    <h5 class="card-title"><b>{{ pharmacy.name }}</b></h5>
-                    <p class="card-text">Phone Number: {{ pharmacy.phone_number }}</p>
-                    <p class="card-text">Email Address: {{ pharmacy.email_address }}</p>
-                    <p class="card-text">Delivery: {{ pharmacy.delivery }}</p>
+                    <h5 class="card-title"><b>{{ pharmacy.clients.name }}</b></h5>
+                    <p class="card-text">Email: {{ pharmacy.clients.email }}</p>
+                    <p class="card-text">Company Name: {{ pharmacy.companies.company_name }}</p>
                 </div>
                 <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#exampleModal"
                         data-whatever="@mdo" @click="editPharmacy(pharmacy)">Edit
@@ -45,32 +29,17 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="name" class="col-form-label">Name:</label>
-                            <input type="text" v-model="new_pharmacy.name" class="form-control" id="name">
+                            <label for="name" class="col-form-label">Client Name:</label>
+                            <input type="text" v-model="new_data.client_name" class="form-control" id="name">
                         </div>
                         <div class="form-group">
-                            <label for="phone_number" class="col-form-label">Phone Number:</label>
-                            <input type="text" v-model="new_pharmacy.phone_number" class="form-control"
-                                   id="phone_number">
+                            <label for="delivery" class="col-form-label">Company Name:</label>
+                            <input type="email" v-model="new_data.company_name" class="form-control" id="delivery">
                         </div>
                         <div class="form-group">
                             <label for="email_address" class="col-form-label">Email Address:</label>
-                            <input type="email" v-model="new_pharmacy.email_address" class="form-control"
+                            <input type="email" v-model="new_data.email" class="form-control"
                                    id="email_address">
-                        </div>
-                        <div class="form-group">
-                            <label for="delivery" class="col-form-label">Delivery:</label>
-                            <input type="email" v-model="new_pharmacy.delivery" class="form-control" id="delivery">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleFormControlFile2">Logo</label>
-                            <input type="file" @change="onLogoChanged" class="form-control-file"
-                                   id="exampleFormControlFile2">
-                        </div>
-                        <div class="form-group">
-                            <label for="exampleFormControlFile1">Images</label>
-                            <input multiple type="file" @change="onFileChange" class="form-control-file"
-                                   id="exampleFormControlFile1">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -95,13 +64,10 @@ Vue.use(VueAxios, axios)
 export default {
     data() {
         return {
-            new_pharmacy: {
-                name: null,
-                phone_number: null,
-                email_address: null,
-                delivery: null,
-                images: [],
-                logo: null,
+            new_data: {
+                client_name: null,
+                company_name: null,
+                email: null
             },
             filter:{
                 delivery:null,
@@ -112,28 +78,22 @@ export default {
         }
     },
     mounted() {
-        Vue.axios.get('http://127.0.0.1:8000/api/pharmacy').then((response) => {
+        Vue.axios.get('http://127.0.0.1:8000/api/client').then((response) => {
             this.pharmacies = response.data;
         })
+        Vue.axios.get('http://127.0.0.1:8000/api/macthes').then((response) => {
+            this.pharmacies = response.data;
+        })
+        
     },
     methods: {
         savePharmacy() {
             let form = new FormData();
-            form.append('name', this.new_pharmacy.name);
-            form.append('phone_number', this.new_pharmacy.phone_number);
-            if (this.new_pharmacy.images && this.new_pharmacy.images.length) {
-                for (let i = 0; i < this.new_pharmacy.images.length; i++) {
-                    form.append('images[]', this.new_pharmacy.images[i]);
-                }
-            }
-            if (this.new_pharmacy.delivery)
-                form.append('delivery', this.new_pharmacy.delivery);
-            if (this.new_pharmacy.logo)
-                form.append('logo[]', this.new_pharmacy.logo);
-            if (this.new_pharmacy.email_address)
-                form.append('email_address', this.new_pharmacy.email_address);
+            form.append('client_name', this.new_data.client_name);
+            form.append('company_name', this.new_data.company_name);
+            form.append('email', this.new_data.email);
             let that = this;
-            Vue.axios.post('/api/pharmacy', form)
+            Vue.axios.post('/api/client', form)
                 .then(function (response) {
                     $('#exampleModal').modal('hide');
                     that.new_pharmacy = {};

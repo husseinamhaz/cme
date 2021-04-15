@@ -1971,24 +1971,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -1996,13 +1978,14 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      new_pharmacy: {
-        name: null,
-        phone_number: null,
-        email_address: null,
+      new_data: {
+        client_name: null,
+        company_name: null,
+        email: null
+      },
+      filter: {
         delivery: null,
-        images: [],
-        logo: null
+        name: null
       },
       pharmacies: [],
       modal_type: 'create'
@@ -2011,27 +1994,21 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
   mounted: function mounted() {
     var _this = this;
 
-    vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/pharmacy').then(function (response) {
+    vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/client').then(function (response) {
+      _this.pharmacies = response.data;
+    });
+    vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/macthes').then(function (response) {
       _this.pharmacies = response.data;
     });
   },
   methods: {
     savePharmacy: function savePharmacy() {
       var form = new FormData();
-      form.append('name', this.new_pharmacy.name);
-      form.append('phone_number', this.new_pharmacy.phone_number);
-
-      if (this.new_pharmacy.images && this.new_pharmacy.images.length) {
-        for (var i = 0; i < this.new_pharmacy.images.length; i++) {
-          form.append('images[]', this.new_pharmacy.images[i]);
-        }
-      }
-
-      if (this.new_pharmacy.delivery) form.append('delivery', this.new_pharmacy.delivery);
-      if (this.new_pharmacy.logo) form.append('logo[]', this.new_pharmacy.logo);
-      if (this.new_pharmacy.email_address) form.append('email_address', this.new_pharmacy.email_address);
+      form.append('client_name', this.new_data.client_name);
+      form.append('company_name', this.new_data.company_name);
+      form.append('email', this.new_data.email);
       var that = this;
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('/api/pharmacy', form).then(function (response) {
+      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('/api/client', form).then(function (response) {
         $('#exampleModal').modal('hide');
         that.new_pharmacy = {};
         that.pharmacies.push(response.data);
@@ -2088,6 +2065,23 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
       var files = e.target.files || e.target.files;
       if (!files.length) return;
       this.new_pharmacy.logo = files[0];
+    },
+    search: function search() {
+      var _this2 = this;
+
+      var filters = {};
+
+      if (this.filter.delivery) {
+        filters.delivery = this.filter.delivery;
+      }
+
+      if (this.filter.name) {
+        filters.name = this.filter.name;
+      }
+
+      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('http://127.0.0.1:8000/api/pharmacy/search', filters).then(function (response) {
+        _this2.pharmacies = response.data;
+      });
     },
     addNewPharmacyPopup: function addNewPharmacyPopup() {
       this.new_pharmacy = {
@@ -37794,31 +37788,19 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "card" }, [
-              pharmacy.logo
-                ? _c("img", {
-                    staticClass: "card-img-top",
-                    attrs: {
-                      src: "images/logos/" + pharmacy.logo,
-                      alt: "Card image cap"
-                    }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
               _c("div", { staticClass: "card-body" }, [
                 _c("h5", { staticClass: "card-title" }, [
-                  _c("b", [_vm._v(_vm._s(pharmacy.name))])
+                  _c("b", [_vm._v(_vm._s(pharmacy.clients.name))])
                 ]),
                 _vm._v(" "),
                 _c("p", { staticClass: "card-text" }, [
-                  _vm._v("Phone Number: " + _vm._s(pharmacy.phone_number))
+                  _vm._v("Email: " + _vm._s(pharmacy.clients.email))
                 ]),
                 _vm._v(" "),
                 _c("p", { staticClass: "card-text" }, [
-                  _vm._v("Email Address: " + _vm._s(pharmacy.email_address))
-                ]),
-                _vm._v(" "),
-                _c("p", { staticClass: "card-text" }, [
-                  _vm._v("Delivery: " + _vm._s(pharmacy.delivery))
+                  _vm._v(
+                    "Company Name: " + _vm._s(pharmacy.companies.company_name)
+                  )
                 ])
               ]),
               _vm._v(" "),
@@ -37899,7 +37881,7 @@ var render = function() {
                     _c(
                       "label",
                       { staticClass: "col-form-label", attrs: { for: "name" } },
-                      [_vm._v("Name:")]
+                      [_vm._v("Client Name:")]
                     ),
                     _vm._v(" "),
                     _c("input", {
@@ -37907,21 +37889,21 @@ var render = function() {
                         {
                           name: "model",
                           rawName: "v-model",
-                          value: _vm.new_pharmacy.name,
-                          expression: "new_pharmacy.name"
+                          value: _vm.new_data.client_name,
+                          expression: "new_data.client_name"
                         }
                       ],
                       staticClass: "form-control",
                       attrs: { type: "text", id: "name" },
-                      domProps: { value: _vm.new_pharmacy.name },
+                      domProps: { value: _vm.new_data.client_name },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
                             return
                           }
                           _vm.$set(
-                            _vm.new_pharmacy,
-                            "name",
+                            _vm.new_data,
+                            "client_name",
                             $event.target.value
                           )
                         }
@@ -37934,9 +37916,9 @@ var render = function() {
                       "label",
                       {
                         staticClass: "col-form-label",
-                        attrs: { for: "phone_number" }
+                        attrs: { for: "delivery" }
                       },
-                      [_vm._v("Phone Number:")]
+                      [_vm._v("Company Name:")]
                     ),
                     _vm._v(" "),
                     _c("input", {
@@ -37944,21 +37926,21 @@ var render = function() {
                         {
                           name: "model",
                           rawName: "v-model",
-                          value: _vm.new_pharmacy.phone_number,
-                          expression: "new_pharmacy.phone_number"
+                          value: _vm.new_data.company_name,
+                          expression: "new_data.company_name"
                         }
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "phone_number" },
-                      domProps: { value: _vm.new_pharmacy.phone_number },
+                      attrs: { type: "email", id: "delivery" },
+                      domProps: { value: _vm.new_data.company_name },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
                             return
                           }
                           _vm.$set(
-                            _vm.new_pharmacy,
-                            "phone_number",
+                            _vm.new_data,
+                            "company_name",
                             $event.target.value
                           )
                         }
@@ -37981,90 +37963,21 @@ var render = function() {
                         {
                           name: "model",
                           rawName: "v-model",
-                          value: _vm.new_pharmacy.email_address,
-                          expression: "new_pharmacy.email_address"
+                          value: _vm.new_data.email,
+                          expression: "new_data.email"
                         }
                       ],
                       staticClass: "form-control",
                       attrs: { type: "email", id: "email_address" },
-                      domProps: { value: _vm.new_pharmacy.email_address },
+                      domProps: { value: _vm.new_data.email },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
                             return
                           }
-                          _vm.$set(
-                            _vm.new_pharmacy,
-                            "email_address",
-                            $event.target.value
-                          )
+                          _vm.$set(_vm.new_data, "email", $event.target.value)
                         }
                       }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      {
-                        staticClass: "col-form-label",
-                        attrs: { for: "delivery" }
-                      },
-                      [_vm._v("Delivery:")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.new_pharmacy.delivery,
-                          expression: "new_pharmacy.delivery"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "email", id: "delivery" },
-                      domProps: { value: _vm.new_pharmacy.delivery },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.new_pharmacy,
-                            "delivery",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "exampleFormControlFile2" } }, [
-                      _vm._v("Logo")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control-file",
-                      attrs: { type: "file", id: "exampleFormControlFile2" },
-                      on: { change: _vm.onLogoChanged }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "exampleFormControlFile1" } }, [
-                      _vm._v("Images")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control-file",
-                      attrs: {
-                        multiple: "",
-                        type: "file",
-                        id: "exampleFormControlFile1"
-                      },
-                      on: { change: _vm.onFileChange }
                     })
                   ])
                 ]),
@@ -50473,8 +50386,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/user11/Code/pharmacies/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/user11/Code/pharmacies/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/user11/Code/testo/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/user11/Code/testo/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

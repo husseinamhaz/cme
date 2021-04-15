@@ -24,9 +24,9 @@ class PharmacyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'required',
-            'phone_number'=>'required|numeric|min:6',
-            'email_address'=>'email',
+            'client_name'=>'required',
+            'company_name'=>'required',
+            'email'=>'email',
         ];
     }
 }
