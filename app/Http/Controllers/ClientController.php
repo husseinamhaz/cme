@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\PharmacyRequest;
-use App\Http\Requests\SearchPharmacyRequest;
+use App\Http\Requests\ClientRequest;
 use App\Clients;
 use App\Companies;
 use App\CompaniesClientsR;
@@ -65,7 +64,7 @@ class ClientController extends Controller
     /**
      * Store new Client and Company
      */
-    public function storeCompanyClientRelation(PharmacyRequest $request)
+    public function storeCompanyClientRelation(ClientRequest $request)
     {
         try {
             $data = $request->all();
@@ -123,16 +122,16 @@ class ClientController extends Controller
     {
 
         try {
-             $data = json_decode(Http::get('https://ah-devsec.com/test/'));
+             // $data = json_decode(Http::get('https://ah-devsec.com/test/'));
+            // because http:get has curl error in my laptop i set the data staticly
+            $data=[["name"=>"haysen","email"=>"haysen@outlook.com"],["name"=>"lara","email"=>"lara@gmail.com"]];
              $matchThese=[];
              $where='';
+             $query = Clients::query();
              foreach ($data as $key => $value) {
-                array_push($matchThese, ['name'=>$value->name,'email'=>$value->email]);
-                // $where='name='$value->name.'AND email='.$value->email.' AND '.$where;
+                $query = $query->orwhere('name', $value['name'])->where('email',$value['email']);
              }
-             return $matchThese;
-
-            return Clients::where($matchThese)->get();
+             return $query->get();
         } catch (\Exception $e) {
             return [
                 'message' => $e->getMessage(),

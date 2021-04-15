@@ -1971,6 +1971,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1983,26 +1993,22 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
         company_name: null,
         email: null
       },
-      filter: {
-        delivery: null,
-        name: null
-      },
-      pharmacies: [],
-      modal_type: 'create'
+      matches: [],
+      data: []
     };
   },
   mounted: function mounted() {
     var _this = this;
 
     vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/client').then(function (response) {
-      _this.pharmacies = response.data;
+      _this.data = response.data;
     });
     vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.get('http://127.0.0.1:8000/api/macthes').then(function (response) {
-      _this.pharmacies = response.data;
+      _this.matches = response.data;
     });
   },
   methods: {
-    savePharmacy: function savePharmacy() {
+    saveClient: function saveClient() {
       var form = new FormData();
       form.append('client_name', this.new_data.client_name);
       form.append('company_name', this.new_data.company_name);
@@ -2010,89 +2016,28 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_axios__WEBPACK_IMPORTED_MODUL
       var that = this;
       vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('/api/client', form).then(function (response) {
         $('#exampleModal').modal('hide');
-        that.new_pharmacy = {};
-        that.pharmacies.push(response.data);
+        that.new_data = {};
+        var result = {
+          clients: {
+            name: response.data.client_name,
+            email: response.data.email
+          },
+          companies: {
+            company_name: response.data.company_name
+          }
+        };
+        that.data.push(result);
         that.$forceUpdate();
       })["catch"](function (error) {
         console.log(error);
       });
     },
-    updatePharmacy: function updatePharmacy() {
-      var form = new FormData();
-      form.append('name', this.new_pharmacy.name);
-      form.append('phone_number', this.new_pharmacy.phone_number);
-
-      if (this.new_pharmacy.images && this.new_pharmacy.images.length) {
-        for (var i = 0; i < this.new_pharmacy.images.length; i++) {
-          form.append('images[]', this.new_pharmacy.images[i]);
-        }
-      }
-
-      if (this.new_pharmacy.delivery) form.append('delivery', this.new_pharmacy.delivery);
-      if (this.new_pharmacy.logo) form.append('logo[]', this.new_pharmacy.logo);
-      if (this.new_pharmacy.email_address) form.append('email_address', this.new_pharmacy.email_address);
-      var that = this;
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.put('/api/pharmacy/' + this.new_pharmacy.id, form).then(function (response) {
-        $('#exampleModal').modal('hide');
-        that.new_pharmacy = {}; // that.pharmacies.push(response.data);
-
-        that.modal_type = 'create';
-        that.$forceUpdate();
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    },
-    deletePharmacy: function deletePharmacy(data) {
-      var that = this;
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios["delete"]('/api/pharmacy/' + data.id).then(function (response) {
-        if (response) that.pharmacies.splice(that.pharmacies.indexOf(data), 1);
-      });
-    },
-    onFileChange: function onFileChange(e) {
-      var files = e.target.files || e.target.files;
-      if (!files.length) return;
-      this.new_pharmacy.images = files;
-    },
-    editPharmacy: function editPharmacy(pharmacy) {
-      var pharma = JSON.parse(JSON.stringify(pharmacy));
-      delete pharma.logo;
-      delete pharma.images;
-      this.new_pharmacy = pharma;
-      this.modal_type = 'update';
-      this.$forceUpdate();
-    },
-    onLogoChanged: function onLogoChanged(e) {
-      var files = e.target.files || e.target.files;
-      if (!files.length) return;
-      this.new_pharmacy.logo = files[0];
-    },
-    search: function search() {
-      var _this2 = this;
-
-      var filters = {};
-
-      if (this.filter.delivery) {
-        filters.delivery = this.filter.delivery;
-      }
-
-      if (this.filter.name) {
-        filters.name = this.filter.name;
-      }
-
-      vue__WEBPACK_IMPORTED_MODULE_0___default.a.axios.post('http://127.0.0.1:8000/api/pharmacy/search', filters).then(function (response) {
-        _this2.pharmacies = response.data;
-      });
-    },
-    addNewPharmacyPopup: function addNewPharmacyPopup() {
-      this.new_pharmacy = {
-        name: null,
-        phone_number: null,
-        email_address: null,
-        delivery: null,
-        images: [],
-        logo: null
+    addNewClientPopup: function addNewClientPopup() {
+      this.new_data = {
+        client_name: null,
+        company_name: null,
+        email: null
       };
-      this.modal_type = 'create';
       this.$forceUpdate();
     }
   }
@@ -37775,251 +37720,240 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "col-md-12" },
-    [
-      _vm._l(_vm.pharmacies, function(pharmacy) {
+  return _c("div", { staticClass: "col-md-12" }, [
+    _c(
+      "div",
+      { staticClass: "col-md-12" },
+      _vm._l(_vm.data, function(value) {
         return _c(
           "div",
           {
-            staticClass: " col-md-2",
+            staticClass: " col-md-3",
             staticStyle: { float: "left", "padding-bottom": "15px" }
           },
           [
             _c("div", { staticClass: "card" }, [
               _c("div", { staticClass: "card-body" }, [
                 _c("h5", { staticClass: "card-title" }, [
-                  _c("b", [_vm._v(_vm._s(pharmacy.clients.name))])
+                  _c("b", [_vm._v(_vm._s(value.clients.name))])
                 ]),
                 _vm._v(" "),
                 _c("p", { staticClass: "card-text" }, [
-                  _vm._v("Email: " + _vm._s(pharmacy.clients.email))
+                  _vm._v("Email: " + _vm._s(value.clients.email))
                 ]),
                 _vm._v(" "),
                 _c("p", { staticClass: "card-text" }, [
                   _vm._v(
-                    "Company Name: " + _vm._s(pharmacy.companies.company_name)
+                    "Company Name: " + _vm._s(value.companies.company_name)
                   )
                 ])
-              ]),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-outline-info",
-                  attrs: {
-                    type: "button",
-                    "data-toggle": "modal",
-                    "data-target": "#exampleModal",
-                    "data-whatever": "@mdo"
-                  },
-                  on: {
-                    click: function($event) {
-                      return _vm.editPharmacy(pharmacy)
-                    }
-                  }
-                },
-                [_vm._v("Edit\n            ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-outline-danger",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.deletePharmacy(pharmacy)
-                    }
-                  }
-                },
-                [_vm._v("Delete")]
-              )
+              ])
             ])
           ]
         )
       }),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary",
-          attrs: {
-            type: "button",
-            "data-toggle": "modal",
-            "data-target": "#exampleModal",
-            "data-whatever": "@mdo"
-          },
-          on: { click: _vm.addNewPharmacyPopup }
-        },
-        [_vm._v("Add New Pharmacy\n    ")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "modal fade",
-          attrs: {
-            id: "exampleModal",
-            tabindex: "-1",
-            role: "dialog",
-            "aria-labelledby": "exampleModalLabel",
-            "aria-hidden": "true"
-          }
-        },
-        [
-          _c(
+      0
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "col-md-12" },
+      [
+        _c("h1", { staticClass: "col-md-12" }, [_vm._v("All Matches")]),
+        _vm._v(" "),
+        _vm._l(_vm.matches, function(match) {
+          return _c(
             "div",
-            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            {
+              staticClass: " col-md-2",
+              staticStyle: { float: "left", "padding-bottom": "15px" }
+            },
             [
-              _c("div", { staticClass: "modal-content" }, [
-                _vm._m(0),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      { staticClass: "col-form-label", attrs: { for: "name" } },
-                      [_vm._v("Client Name:")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.new_data.client_name,
-                          expression: "new_data.client_name"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "text", id: "name" },
-                      domProps: { value: _vm.new_data.client_name },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.new_data,
-                            "client_name",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
+              _c("div", { staticClass: "card" }, [
+                _c("div", { staticClass: "card-body" }, [
+                  _c("h5", { staticClass: "card-title" }, [
+                    _c("b", [_vm._v(_vm._s(match.name))])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      {
-                        staticClass: "col-form-label",
-                        attrs: { for: "delivery" }
-                      },
-                      [_vm._v("Company Name:")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.new_data.company_name,
-                          expression: "new_data.company_name"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "email", id: "delivery" },
-                      domProps: { value: _vm.new_data.company_name },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.new_data,
-                            "company_name",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      {
-                        staticClass: "col-form-label",
-                        attrs: { for: "email_address" }
-                      },
-                      [_vm._v("Email Address:")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.new_data.email,
-                          expression: "new_data.email"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "email", id: "email_address" },
-                      domProps: { value: _vm.new_data.email },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.new_data, "email", $event.target.value)
-                        }
-                      }
-                    })
+                  _c("p", { staticClass: "card-text" }, [
+                    _vm._v("Email: " + _vm._s(match.email))
                   ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-secondary",
-                      attrs: { type: "button", "data-dismiss": "modal" }
-                    },
-                    [_vm._v("Close")]
-                  ),
-                  _vm._v(" "),
-                  _vm.modal_type === "update"
-                    ? _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-primary",
-                          attrs: { type: "button" },
-                          on: { click: _vm.updatePharmacy }
-                        },
-                        [_vm._v("Update\n                    ")]
-                      )
-                    : _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-primary",
-                          attrs: { type: "button" },
-                          on: { click: _vm.savePharmacy }
-                        },
-                        [_vm._v("Save")]
-                      )
                 ])
               ])
             ]
           )
-        ]
-      )
-    ],
-    2
-  )
+        })
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        attrs: {
+          type: "button",
+          "data-toggle": "modal",
+          "data-target": "#exampleModal",
+          "data-whatever": "@mdo"
+        },
+        on: { click: _vm.addNewClientPopup }
+      },
+      [_vm._v("Add New Client\n    ")]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "exampleModal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c(
+                    "label",
+                    { staticClass: "col-form-label", attrs: { for: "name" } },
+                    [_vm._v("Client Name:")]
+                  ),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.new_data.client_name,
+                        expression: "new_data.client_name"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", id: "name" },
+                    domProps: { value: _vm.new_data.client_name },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.new_data,
+                          "client_name",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-form-label",
+                      attrs: { for: "delivery" }
+                    },
+                    [_vm._v("Company Name:")]
+                  ),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.new_data.company_name,
+                        expression: "new_data.company_name"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "email", id: "delivery" },
+                    domProps: { value: _vm.new_data.company_name },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.new_data,
+                          "company_name",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-form-label",
+                      attrs: { for: "email_address" }
+                    },
+                    [_vm._v("Email Address:")]
+                  ),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.new_data.email,
+                        expression: "new_data.email"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "email", id: "email_address" },
+                    domProps: { value: _vm.new_data.email },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.new_data, "email", $event.target.value)
+                      }
+                    }
+                  })
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.saveClient }
+                  },
+                  [_vm._v("Save")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    )
+  ])
 }
 var staticRenderFns = [
   function() {
@@ -38030,7 +37964,7 @@ var staticRenderFns = [
       _c(
         "h5",
         { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
-        [_vm._v("Add New Pharmacy")]
+        [_vm._v("Add New Client")]
       ),
       _vm._v(" "),
       _c(
@@ -50386,8 +50320,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/user11/Code/testo/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/user11/Code/testo/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\admin\Desktop\Code\cme\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\admin\Desktop\Code\cme\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
